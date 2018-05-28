@@ -13,6 +13,9 @@
     <file>images/xml.png</file>
     <file>images/xsd.png</file>
     <file>images/sdt.png</file>
-	<file>images/bookmark.png</file>
+    <file>images/bookmark.png</file>
+    <file>images/project_structure.png</file>
+    <file>images/project_output.png</file>
+    <file>images/project_bookmarks.png</file>
   </qresource>
 </RCC>

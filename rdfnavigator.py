@@ -236,8 +236,11 @@ class RDFNavigator(QMainWindow):
         self.findAct =     QAction(QIcon(':/images/find.png'), "&Find", self, shortcut=QKeySequence.Find, statusTip="Find text", triggered=self.activateFind)
         
         self.settingsAct = QAction(QIcon(':/images/settings.png'), "Open settings", self, shortcut=QKeySequence("Ctrl+1"), statusTip="Open Settings", triggered=self.activateSettings)
-           
-        
+
+        self.showProjectStructAct = QAction(QIcon(':/images/project_structure.png'), "Show structure", self, shortcut=QKeySequence("Alt+1"), statusTip="Show project structure", triggered=self.showProjectStructure)
+        self.showOutputAct = QAction(QIcon(':/images/project_output.png'), "Show output", self, shortcut=QKeySequence("Alt+2"), statusTip="Show output", triggered=self.showOutput)
+        self.showBookmarks = QAction(QIcon(':/images/project_bookmarks.png'), "Show bookmarks", self, shortcut=QKeySequence("Alt+3"), statusTip="Show bookmarks", triggered=self.showBookmarks)
+
         self.closeAct =    QAction("Cl&ose", self, statusTip="Close the active window", triggered=self.mdiArea.closeActiveSubWindow)
         self.closeAllAct = QAction("Close &All", self, statusTip="Close all the windows", triggered=self.mdiArea.closeAllSubWindows)
         self.tileAct =     QAction("&Tile", self, statusTip="Tile the windows", triggered=self.mdiArea.tileSubWindows)
@@ -269,9 +272,12 @@ class RDFNavigator(QMainWindow):
         self.editMenu.addAction(self.copyAct)
         self.editMenu.addAction(self.pasteAct)
         self.editMenu.addAction(self.findAct)
-        
+
         self.settingsMenu = self.menuBar().addMenu("Set&tings")
         self.settingsMenu.addAction(self.settingsAct)
+
+        self.viewMenu = self.menuBar().addMenu("&View")
+        self.createViewMenu()
         
         self.windowMenu = self.menuBar().addMenu("&Window")
         self.updateWindowMenu()
@@ -390,7 +396,7 @@ class RDFNavigator(QMainWindow):
         child = self.activeMdiChild()
         if child is not None:
             child.displayRefValue(value)
-    
+
     def showBookmark(self, filename, line):
         child = self.findMdiChild(filename)
         if child is None:
@@ -398,3 +404,18 @@ class RDFNavigator(QMainWindow):
             child = self.findMdiChild(filename)
         self.mdiArea.setActiveSubWindow(child)
         child.widget().goToLine(line)
+
+    def createViewMenu(self):
+        self.viewMenu.addAction(self.showProjectStructAct)
+        self.viewMenu.addAction(self.showOutputAct)
+        self.viewMenu.addAction(self.showBookmarks)
+
+    def showProjectStructure(self):
+        self.projectStructureDockWidget.show()
+
+    def showOutput(self):
+        self.projectOutputDockWidget.show()
+
+    def showBookmarks(self):
+        self.bookmarksDockWidget.show()
+
