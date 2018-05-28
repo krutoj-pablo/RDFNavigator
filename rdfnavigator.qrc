@@ -1,0 +1,18 @@
+<RCC>
+  <qresource>
+    <file>images/copy.png</file>
+    <file>images/cut.png</file>
+    <file>images/new.png</file>
+    <file>images/open.png</file>
+    <file>images/openProject.png</file>
+    <file>images/paste.png</file>
+    <file>images/save.png</file>
+    <file>images/find.png</file>
+    <file>images/rdf.png</file>
+    <file>images/settings.png</file>
+    <file>images/xml.png</file>
+    <file>images/xsd.png</file>
+    <file>images/sdt.png</file>
+	<file>images/bookmark.png</file>
+  </qresource>
+</RCC>
