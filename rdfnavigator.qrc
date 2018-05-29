@@ -17,5 +17,8 @@
     <file>images/project_structure.png</file>
     <file>images/project_output.png</file>
     <file>images/project_bookmarks.png</file>
+    <file>images/xml_node.png</file>
+    <file>images/xml_property.png</file>
+    <file>images/xml_text.png</file>
   </qresource>
 </RCC>
