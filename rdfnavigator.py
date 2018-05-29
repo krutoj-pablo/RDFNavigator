@@ -130,6 +130,8 @@ class RDFNavigator(QMainWindow):
             schema.setSchemaPath(fileName)
             graph = schema.getTemplateDependencyGraph()
             self.projectStructureWidget.createProjectTree(fileName, graph, RDFNavigatorChildrenTypes.TEMPLATE)
+            self.projectStructureWidget.createObjectsTree(fileName)
+            self.projectStructureWidget.createFileSystemTree(fileName)
             self.projectStructureWidget.open_file_request.connect(self.openFileHelper)
 
     def save(self):
