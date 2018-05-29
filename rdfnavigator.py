@@ -378,9 +378,9 @@ class RDFNavigator(QMainWindow):
         
     def analyzeSystemData(self):
         self.resourceRefManager.setSysDataPath(self.settingsManager.getConfig('sys_data', ''))
-        self.refs_data, self.vals_data = self.resourceRefManager.analyzeRefs()
-        
-        self.file_refs_data = dict(reduce(lambda x, y: x + y, [[(v, keys) for v in vals]  for keys, vals in self.refs_data.iteritems() if vals != {}]))
+        self.global_refs_data, self.global_vals_data = self.resourceRefManager.analyzeRefs()
+
+        self.global_file_refs_data = dict(reduce(lambda x, y: x + y, [[(v, keys) for v in vals]  for keys, vals in self.global_refs_data.iteritems() if vals != {}]))
 
     def showReference(self, obj_name, key_id):
         child_name = self.file_refs_data[obj_name]
@@ -389,12 +389,12 @@ class RDFNavigator(QMainWindow):
             self.openFileHelper(child_name, RDFNavigatorChildrenTypes.TEMPLATE)
             child = self.findMdiChild(child_name)
         self.mdiArea.setActiveSubWindow(child)
-        line = self.refs_data[child_name][obj_name][key_id]
+        line = self.global_refs_data[child_name][obj_name][key_id]
         child.widget().goToLine(line)
 
     def showReferenceValue(self, obj_name, key_id):
-        child_name = self.file_refs_data[obj_name]
-        value = self.vals_data[child_name][obj_name][key_id]
+        child_name = self.global_file_refs_data[obj_name]
+        value = self.global_vals_data[child_name][obj_name][key_id]
         child = self.activeMdiChild()
         if child is not None:
             child.displayRefValue(value)
