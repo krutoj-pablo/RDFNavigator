@@ -8,13 +8,14 @@ import os
 
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QTreeWidgetItem
+from PyQt5.QtCore import Qt, QFile, QIODevice, pyqtSignal
+from PyQt5.QtWidgets import QTreeWidgetItem, QFileSystemModel
+from PyQt5.QtXml import QDomDocument
 
 #from PyQt5.QtCore import pyqtRemoveInputHook
+from rdfnavigatorobjectsdommodel import RDFNavigatorObjectsDomModel
 
 from projectstructure_ui import Ui_ProjectStructureWidget
-
 
 class RDFNavigatorProjectStructure(QWidget, Ui_ProjectStructureWidget):
     open_file_request = pyqtSignal(str, int)
@@ -23,6 +24,8 @@ class RDFNavigatorProjectStructure(QWidget, Ui_ProjectStructureWidget):
         self.setupUi(self)
         self.basicStructureWidget.itemDoubleClicked.connect(self.createOpenFileRequest)
         self.childType = None
+        self.objectsStructureModel = RDFNavigatorObjectsDomModel(QDomDocument(), self)
+        self.objectsStructureView.setModel(self.objectsStructureModel)
 
     def createProjectTree(self, fileName, graph, childType):
         def createProjectTreeHelper(fileName, graph, root):
@@ -39,7 +42,27 @@ class RDFNavigatorProjectStructure(QWidget, Ui_ProjectStructureWidget):
         root.setData(0, Qt.UserRole, fileName)
         root.setIcon(0, QIcon(':/images/xsd.png'))
         createProjectTreeHelper(fileName, graph, root)
-    
-    
+
     def createOpenFileRequest(self, item, column):
         self.open_file_request.emit(item.data(0, Qt.UserRole), self.childType)
+
+    def createObjectsTree(self, filePath):
+        if os.path.exists(filePath):
+            f = QFile(filePath)
+            if f.open(QIODevice.ReadOnly):
+                document = QDomDocument()
+                if document.setContent(f):
+                    newModel = RDFNavigatorObjectsDomModel(document, self)
+                    self.objectsStructureView.setModel(newModel)
+                    self.objectsStructureModel = newModel
+                f.close()
+
+    def createFileSystemTree(self, filePath):
+        self.filesystemModel = QFileSystemModel(self)
+        self.filesystemModel.setRootPath(os.path.dirname(filePath))
+        self.filesystemTreeView.setModel(self.filesystemModel)
+        map(self.filesystemTreeView.hideColumn, range(1, 4))
+
+    def on_filesystemTreeView_doubleClicked(self, index):
+        file_path = self.filesystemModel.filePath(index)
+        self.open_file_request.emit(file_path, self.childType)
