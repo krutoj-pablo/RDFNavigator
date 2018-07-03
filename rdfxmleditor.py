@@ -7,13 +7,13 @@ Created on Fri Feb 23 13:03:28 2018
 import re
 
 from PyQt5.QtGui import QFont, QFontMetrics, QColor, QKeySequence
-from PyQt5.QtWidgets import QApplication, QToolTip
-from PyQt5.Qsci import QsciScintilla, QsciLexerXML
+from PyQt5.QtWidgets import QToolTip
+from PyQt5.Qsci import QsciScintilla, QsciLexerXML, QsciAPIs
 
-#from PyQt5.QtCore import Qt, pyqtRemoveInputHook
-from PyQt5.QtCore import pyqtSignal, QPoint, QFile, QTextStream, Qt
+from PyQt5.QtCore import Qt, pyqtRemoveInputHook
+from PyQt5.QtCore import pyqtSignal, QPoint
 
-from PyQt5.QtWidgets import QMenu, QMessageBox
+from PyQt5.QtWidgets import QMenu
 
 class RDFXmlEditor(QsciScintilla):
     ARROW_MARKER_NUM = 8
@@ -69,26 +69,26 @@ class RDFXmlEditor(QsciScintilla):
         
         self.setCaretLineBackgroundColor(QColor("#ffe4e4"))
 
-        lexer = QsciLexerXML()
+        self.lexer = QsciLexerXML()
 
-        lexer.setDefaultFont(font)
-        lexer.setColor(QColor(26, 26, 255, 250), QsciLexerXML.Tag)
-        font = lexer.font(QsciLexerXML.Tag)
+        self.lexer.setDefaultFont(font)
+        self.lexer.setColor(QColor(26, 26, 255, 250), QsciLexerXML.Tag)
+        font = self.lexer.font(QsciLexerXML.Tag)
         font.setBold(True)
-        lexer.setFont(font, QsciLexerXML.Tag)
+        self.lexer.setFont(font, QsciLexerXML.Tag)
         
-        lexer.setColor(QColor(230, 115, 0, 250), QsciLexerXML.Attribute)
-        font = lexer.font(QsciLexerXML.Attribute)
+        self.lexer.setColor(QColor(230, 115, 0, 250), QsciLexerXML.Attribute)
+        font = self.lexer.font(QsciLexerXML.Attribute)
         font.setBold(True)
-        lexer.setFont(font, QsciLexerXML.Attribute)
+        self.lexer.setFont(font, QsciLexerXML.Attribute)
         
-        lexer.setColor(QColor(0, 148, 43, 250), QsciLexerXML.HTMLDoubleQuotedString)
-        font = lexer.font(QsciLexerXML.HTMLDoubleQuotedString)
+        self.lexer.setColor(QColor(0, 148, 43, 250), QsciLexerXML.HTMLDoubleQuotedString)
+        font = self.lexer.font(QsciLexerXML.HTMLDoubleQuotedString)
         font.setBold(True)
-        lexer.setFont(font, QsciLexerXML.HTMLDoubleQuotedString)
+        self.lexer.setFont(font, QsciLexerXML.HTMLDoubleQuotedString)
         #lexer.setColor(QColor(0, 153, 51, 250), QsciLexerXML.XMLStart)
         #lexer.setColor(QColor(0, 153, 51, 250), QsciLexerXML.XMLEnd)
-        self.setLexer(lexer)
+        self.setLexer(self.lexer)
         #self.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 1, 'Courier')
 
         # Don't want to see the horizontal scrollbar at all
@@ -174,7 +174,7 @@ class RDFXmlTemplateEditor(RDFXmlEditor):
         super(RDFXmlTemplateEditor, self).__init__(parent)
         self.indicatorDefine(QsciScintilla.FullBoxIndicator, self.INDICATOR_REF)
         self.setMatchedBraceIndicator(self.INDICATOR_REF)
-        
+
         self.indicatorDefine(QsciScintilla.StraightBoxIndicator , self.INDICATOR_TEXT)
         self.setIndicatorForegroundColor(QColor(255, 128, 255, 120), self.INDICATOR_TEXT)
 
@@ -186,6 +186,8 @@ class RDFXmlTemplateEditor(RDFXmlEditor):
         self.setIndicatorForegroundColor(QColor(255, 128, 128, 120), self.INDICATOR_PARAMETER)
         self.indicatorReleased.connect(self.reactOnIndicatorReleased)
         self.cursorPositionChanged.connect(self.reactOnCursorPositionChanged)
+        self.setAutoCompletionSource(QsciScintilla.AcsAPIs)
+        self.__prepare_autoCompletion()
 
     def indicateRefs(self):
         self.indicatorHelper('\{[A-Za-z]+\.[0-9]+\}', self.INDICATOR_REF)
@@ -238,3 +240,11 @@ class RDFXmlTemplateEditor(RDFXmlEditor):
         self.indicateRefs()
         self.indicatePlaceholders()
         self.indicateParameters()
+
+    def __prepare_autoCompletion(self):
+        self.api = QsciAPIs(self.lexer)
+        self.setAutoCompletionThreshold(5)
+        autocompletions = ["variable_one", "variable_two", "function_one(int arg_1)", "function_two(float arg_1)"]
+        map(self.api.add, autocompletions)
+        self.api.prepare()
+        print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! prepared"
