@@ -383,7 +383,7 @@ class RDFNavigator(QMainWindow):
         self.global_file_refs_data = dict(reduce(lambda x, y: x + y, [[(v, keys) for v in vals]  for keys, vals in self.global_refs_data.iteritems() if vals != {}]))
 
     def showReference(self, obj_name, key_id):
-        child_name = self.file_refs_data[obj_name]
+        child_name = self.global_file_refs_data[obj_name]
         child = self.findMdiChild(child_name)
         if child is None:
             self.openFileHelper(child_name, RDFNavigatorChildrenTypes.TEMPLATE)
