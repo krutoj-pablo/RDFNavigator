@@ -133,6 +133,7 @@ class RDFNavigator(QMainWindow):
             self.projectStructureWidget.createObjectsTree(fileName)
             self.projectStructureWidget.createFileSystemTree(fileName)
             self.projectStructureWidget.open_file_request.connect(self.openFileHelper)
+            self.analyzeTemplateData(os.path.dirname(fileName))
 
     def save(self):
         if self.activeMdiChild() and self.activeMdiChild().save():
@@ -379,22 +380,43 @@ class RDFNavigator(QMainWindow):
     def analyzeSystemData(self):
         self.resourceRefManager.setSysDataPath(self.settingsManager.getConfig('sys_data', ''))
         self.global_refs_data, self.global_vals_data = self.resourceRefManager.analyzeRefs()
-
-        self.global_file_refs_data = dict(reduce(lambda x, y: x + y, [[(v, keys) for v in vals]  for keys, vals in self.global_refs_data.iteritems() if vals != {}]))
+        
+        if self.global_refs_data != {} and self.global_vals_data != {}:
+            self.global_file_refs_data = dict(reduce(lambda x, y: x + y, [[(v, keys) for v in vals]  for keys, vals in self.global_refs_data.iteritems() if vals != {}]))
+    
+    def analyzeTemplateData(self, template_path):
+        sysDataPath = self.resourceRefManager.getSysDataPath()
+        self.resourceRefManager.setSysDataPath(template_path)
+        self.template_refs_data, self.template_vals_data = self.resourceRefManager.analyzeRefs()
+        if self.template_refs_data != {} and self.template_vals_data != {}:
+            self.template_file_refs_data = dict(reduce(lambda x, y: x + y, [[(v, keys) for v in vals]  for keys, vals in self.template_refs_data.iteritems() if vals != {}]))
+            self.resourceRefManager.setSysDataPath(sysDataPath)
 
     def showReference(self, obj_name, key_id):
-        child_name = self.global_file_refs_data[obj_name]
+        child_name = self.template_file_refs_data.get(obj_name)
+        if child_name is None:
+            child_name = self.global_file_refs_data[obj_name]
         child = self.findMdiChild(child_name)
         if child is None:
             self.openFileHelper(child_name, RDFNavigatorChildrenTypes.TEMPLATE)
             child = self.findMdiChild(child_name)
         self.mdiArea.setActiveSubWindow(child)
-        line = self.global_refs_data[child_name][obj_name][key_id]
+        line = None
+        try:
+            line = self.template_refs_data[child_name][obj_name][key_id]
+        except KeyError:
+            line = self.global_refs_data[child_name][obj_name][key_id]
         child.widget().goToLine(line)
 
     def showReferenceValue(self, obj_name, key_id):
-        child_name = self.global_file_refs_data[obj_name]
-        value = self.global_vals_data[child_name][obj_name][key_id]
+        child_name = self.template_file_refs_data.get(obj_name)
+        if child_name is None:
+            child_name = self.global_file_refs_data[obj_name]
+        value = None
+        try:
+            value = self.template_vals_data[child_name][obj_name][key_id]
+        except KeyError:
+            value = self.global_refs_data[child_name][obj_name][key_id]
         child = self.activeMdiChild()
         if child is not None:
             child.displayRefValue(value)

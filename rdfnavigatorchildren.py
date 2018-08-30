@@ -12,7 +12,7 @@ from PyQt5.QtCore import QFile,\
                          QTextStream,\
                          Qt,\
                          pyqtSignal
-                         
+
 from PyQt5.QtGui import QIcon
                         
 from PyQt5.QtWidgets import QApplication,\
@@ -92,6 +92,7 @@ class RDFNavigatorChildBase(object):
 
 class RDFNavigatorXmlChild(RDFXmlEditor, RDFNavigatorChildBase):
     sequenceNumber = 1
+    output_message = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super(RDFNavigatorXmlChild, self).__init__(parent)
@@ -101,7 +102,7 @@ class RDFNavigatorXmlChild(RDFXmlEditor, RDFNavigatorChildBase):
         self.isRdf = False
         self.isSchema = False
         self.parent = parent
-    
+
     def newFile(self):
         self.isUntitled = True
         self.curFile = "document%d.xml" % RDFNavigatorXmlChild.sequenceNumber
@@ -152,6 +153,7 @@ class RDFNavigatorXmlChild(RDFXmlEditor, RDFNavigatorChildBase):
         plugins = self.manager.getConfig('rdf_plugins', '')
         thread = RDFNavigatorTransformThread(fileName=fileName, direction='rdf2xml', rdf_tools=tools, rdf_plugins=plugins)
         thread.rdf2xml_transform_done.connect(self.loadXml)
+        thread.transform_output.connect(self.output_message)
         thread.run()
 
     def saveRdf(self, fileName):
@@ -164,10 +166,10 @@ class RDFNavigatorXmlChild(RDFXmlEditor, RDFNavigatorChildBase):
         thread = RDFNavigatorTransformThread(fileName=tempFile, orig_file_name=fileName, direction='xml2rdf', rdf_tools=tools, rdf_plugins=plugins)
         thread.rdf2xml_transform_done.connect(self.postSaveRdf)
         thread.run()
-    
+
     def postSaveRdf(self, originalFileName, fileName):
         os.rename(fileName, originalFileName)
-    
+
     def saveXml(self, fileName):
         file = QFile(fileName)
 
@@ -178,7 +180,6 @@ class RDFNavigatorXmlChild(RDFXmlEditor, RDFNavigatorChildBase):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         outstr << self.text()
         QApplication.restoreOverrideCursor()
-
         self.setCurrentFile(fileName)
 
 
@@ -189,7 +190,7 @@ class RDFNavigatorXmlChild(RDFXmlEditor, RDFNavigatorChildBase):
         schema.validation_message.connect(self.parent.output_message)
         schema.setSchemaPath(os.path.join(schemaPath, 'RdfMain.xsd'))
         schema.validateDocument(self.text())
-    
+
     def contextMenuEvent(self, e):
         menu = self.createBasicContextMenu()
         validateDocAction = menu.addAction("Validate document", self.validateDocument)
@@ -252,7 +253,7 @@ class RDFNavigatorTemplateChild(RDFXmlTemplateEditor, RDFNavigatorChildBase):
     def createBookmark(self, line):
         data = self.text(line)
         self.bookmark_added.emit(self.curFile, line, data)
-    
+
     def deleteBookmark(self, line):
         data = self.text(line)
         self.bookmark_deleted.emit(self.curFile, line, data)

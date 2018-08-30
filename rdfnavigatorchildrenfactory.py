@@ -18,6 +18,7 @@ class RDFNavigatorChildrenFactory(object):
         child = None
         if childType in [RDFNavigatorChildrenTypes.RDF, RDFNavigatorChildrenTypes.XML]:
             child = RDFNavigatorXmlChild(self.parent)
+            child.output_message.connect(self.parent.output_message)
         elif childType == RDFNavigatorChildrenTypes.SCHEMA:
             child = RDFNavigatorSchemaChild(self.parent)
         elif childType == RDFNavigatorChildrenTypes.TEMPLATE:

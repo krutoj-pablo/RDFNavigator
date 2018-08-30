@@ -29,8 +29,7 @@ class RDFNavigatorSingleFileScanner(object):
             if i >= 0:
                 elem.tag = elem.tag[i + 1:]
         return self.__analyzeTextLibraries(root=root)
-        
-    
+
     def __analyzeTextLibraries(self, *args, **kwargs):
         tagName = 'TextLibraries'
         root = kwargs.get('root', None)
@@ -43,9 +42,6 @@ class RDFNavigatorSingleFileScanner(object):
                 refs[lib.attrib['Name']] = dict([(x.attrib['ID'], x.sourceline) for x in lib.getchildren() if type(x.tag) == str and x.attrib.has_key('ID')])
                 vals[lib.attrib['Name']] = dict([(x.attrib['ID'], x.text) for x in lib.getchildren() if type(x.tag) == str and x.attrib.has_key('ID')])
         return refs, vals
-
-
-        
 
 class RDFNavigatorCrossFileScanner(object):
     pass
@@ -86,13 +82,12 @@ class RDFNavigatorXmlSchema(QObject):
             return graph
         return scanHelper(self.path, graph)
 
-    
     def getSchemaDependencyGraph(self):
         return self.getDependencyGraph('schemaLocation')
 
     def getTemplateDependencyGraph(self):
         return self.getDependencyGraph('href')
-    
+
     def validateDocument(self, text):
         with open(self.path, 'r') as f:
             doc = etree.parse(f)

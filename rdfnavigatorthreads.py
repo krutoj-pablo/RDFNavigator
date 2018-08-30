@@ -12,7 +12,8 @@ from PyQt5.QtCore import QThread, pyqtSignal
 class RDFNavigatorTransformThread(QThread):
     rdf2xml_transform_done = pyqtSignal(str)
     xml2rdf_transform_done = pyqtSignal(str, str)
-    
+    transform_output = pyqtSignal(str)
+
     def __init__(self, **kwargs):
         self.fileName     = kwargs.get('fileName', None)
         self.direction    = kwargs.get('direction', None)
@@ -25,13 +26,11 @@ class RDFNavigatorTransformThread(QThread):
         self.wait()
 
     def do_transformation(self):
-        cmd = [os.path.join(self.rdf_tools, self.direction), self.fileName, '-plugins:{0}'.format(self.rdf_plugins)]
+        cmd = [os.path.join(self.rdf_tools, self.direction), self.fileName, '-plugins:{0}'.format(self.rdf_plugins), "-nowait"]
         cmd = map(lambda x: x.replace('/', '\\'), cmd)
-        
         process = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = process.communicate()
-        print out, err
-        
+        self.transform_output.emit(out)
         transform_from, transform_to = self.direction.split('2')
         new_name = os.path.join(os.path.dirname(self.fileName), os.path.basename(self.fileName).replace(".{0}".format(transform_from), '.{0}'.format(transform_to)))
 
@@ -40,7 +39,7 @@ class RDFNavigatorTransformThread(QThread):
         return None
 
     def run(self):
-        if all([self.fileName, self.direction, self.rdf_tools, self.rdf_plugins]) :
+        if all([self.fileName, self.direction, self.rdf_tools, self.rdf_plugins]):
             new_name = self.do_transformation()
             if self.direction == 'rdf2xml' and new_name is not None:
                 self.rdf2xml_transform_done.emit(new_name)

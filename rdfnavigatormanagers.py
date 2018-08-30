@@ -15,7 +15,10 @@ from PyQt5.QtCore import QSettings
 from rdfnavigatorxmldata import RDFNavigatorSingleFileScanner
 
 def scanSingleFileHelper(fileName):
-    scanner = RDFNavigatorSingleFileScanner(fileName=fileName)
+    try:
+        scanner = RDFNavigatorSingleFileScanner(fileName=fileName)
+    except IOError:
+        return fileName, ({}, {})
     return fileName, scanner.analyze()
 
 class RDFNavigatorManagerBase:
@@ -51,7 +54,7 @@ class RDFNavigatorResourceReferenceManager(RDFNavigatorManagerBase):
     def setSysDataPath(self, dataPath):
         self.sysdatapath = dataPath
 
-    def getSysDataPath(self, dataPath):
+    def getSysDataPath(self):
         return self.sysdatapath
 
     def analyzeRefs(self):
@@ -60,7 +63,7 @@ class RDFNavigatorResourceReferenceManager(RDFNavigatorManagerBase):
         
         for result in pool.imap(scanSingleFileHelper, map(lambda x: os.path.join(self.sysdatapath, x), os.listdir(self.sysdatapath))):
             fileName, (r, v ) = result
-            refs[fileName], vals[fileName] =  r, v
-            print "Fille {0} analyzed".format(fileName)
-            
+            if r != {} and v!= {}:
+                refs[fileName], vals[fileName] =  r, v
+                print "Fille {0} analyzed".format(fileName)
         return refs, vals

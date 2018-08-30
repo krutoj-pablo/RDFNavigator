@@ -247,4 +247,4 @@ class RDFXmlTemplateEditor(RDFXmlEditor):
         autocompletions = ["variable_one", "variable_two", "function_one(int arg_1)", "function_two(float arg_1)"]
         map(self.api.add, autocompletions)
         self.api.prepare()
-        print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! prepared"
+
