@@ -17,9 +17,9 @@ from rdfnavigatorxmldata import RDFNavigatorSingleFileScanner
 def scanSingleFileHelper(fileName):
     try:
         scanner = RDFNavigatorSingleFileScanner(fileName=fileName)
+        return fileName, scanner.analyze()
     except IOError:
         return fileName, ({}, {})
-    return fileName, scanner.analyze()
 
 class RDFNavigatorManagerBase:
     __metaclass__ = ABCMeta
