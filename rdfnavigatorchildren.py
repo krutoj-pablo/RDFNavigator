@@ -30,6 +30,9 @@ class RDFNavigatorChildrenTypes(object):
 
 class RDFNavigatorChildBase(object):
 
+    bookmark_added = pyqtSignal(str, int, str)
+    bookmark_deleted = pyqtSignal(str, int, str)
+
     def newFile(self):
         pass
 
@@ -102,6 +105,8 @@ class RDFNavigatorXmlChild(RDFXmlEditor, RDFNavigatorChildBase):
         self.isRdf = False
         self.isSchema = False
         self.parent = parent
+        self.marker_added.connect(self.createBookmark)
+        self.marker_deleted.connect(self.deleteBookmark)
 
     def newFile(self):
         self.isUntitled = True
@@ -204,8 +209,6 @@ class RDFNavigatorSchemaChild(RDFNavigatorXmlChild):
 class RDFNavigatorTemplateChild(RDFXmlTemplateEditor, RDFNavigatorChildBase):
     sequenceNumber = 1
 
-    bookmark_added = pyqtSignal(str, int, str)
-    bookmark_deleted = pyqtSignal(str, int, str)
 
     def __init__(self, parent=None):
         super(RDFNavigatorTemplateChild, self).__init__(parent)
@@ -250,10 +253,3 @@ class RDFNavigatorTemplateChild(RDFXmlTemplateEditor, RDFNavigatorChildBase):
         QApplication.restoreOverrideCursor()
         self.setCurrentFile(fileName)
 
-    def createBookmark(self, line):
-        data = self.text(line)
-        self.bookmark_added.emit(self.curFile, line, data)
-
-    def deleteBookmark(self, line):
-        data = self.text(line)
-        self.bookmark_deleted.emit(self.curFile, line, data)
