@@ -243,6 +243,7 @@ class RDFNavigator(QMainWindow):
         self.showProjectStructAct = QAction(QIcon(':/images/project_structure.png'), "Show structure", self, shortcut=QKeySequence("Alt+1"), statusTip="Show project structure", triggered=self.showProjectStructure)
         self.showOutputAct = QAction(QIcon(':/images/project_output.png'), "Show output", self, shortcut=QKeySequence("Alt+2"), statusTip="Show output", triggered=self.showOutput)
         self.showBookmarks = QAction(QIcon(':/images/project_bookmarks.png'), "Show bookmarks", self, shortcut=QKeySequence("Alt+3"), statusTip="Show bookmarks", triggered=self.showBookmarks)
+        self.showAsDiagram = QAction(QIcon(':/images/diagram.png'), "Show as diagram", self, shortcut=QKeySequence("Alt+4"), statusTip="Show document as diagram", triggered=self.showAsDiagram)
 
         self.closeAct =    QAction("Cl&ose", self, statusTip="Close the active window", triggered=self.mdiArea.closeActiveSubWindow)
         self.closeAllAct = QAction("Close &All", self, statusTip="Close all the windows", triggered=self.mdiArea.closeAllSubWindows)
@@ -433,6 +434,7 @@ class RDFNavigator(QMainWindow):
         self.viewMenu.addAction(self.showProjectStructAct)
         self.viewMenu.addAction(self.showOutputAct)
         self.viewMenu.addAction(self.showBookmarks)
+        self.viewMenu.addAction(self.showAsDiagram)
 
     def showProjectStructure(self):
         self.projectStructureDockWidget.show()
@@ -443,3 +445,8 @@ class RDFNavigator(QMainWindow):
     def showBookmarks(self):
         self.bookmarksDockWidget.show()
 
+    def showAsDiagram(self):
+         from rdfdiagram.rdfdiagramwidget import RdfDiagramWidget
+         rdfdiagram = RdfDiagramWidget(self)
+         self.mdiArea.addSubWindow(rdfdiagram)
+         rdfdiagram.show()
