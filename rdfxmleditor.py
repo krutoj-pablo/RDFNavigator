@@ -165,6 +165,14 @@ class RDFXmlEditor(QsciScintilla):
         else:
             print self.text().find(text, Qt.CaseInsensitive)
 
+    def createBookmark(self, line):
+        data = self.text(line)
+        self.bookmark_added.emit(self.curFile, line, data)
+
+    def deleteBookmark(self, line):
+        data = self.text(line)
+        self.bookmark_deleted.emit(self.curFile, line, data)
+
 class RDFXmlTemplateEditor(RDFXmlEditor):
     crossRefRequested = pyqtSignal(str, str)
     crossRefValueRequested = pyqtSignal(str, str)
