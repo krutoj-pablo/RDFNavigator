@@ -21,5 +21,6 @@
     <file>images/xml_property.png</file>
     <file>images/xml_text.png</file>
     <file>images/navigator.png</file>
+    <file>images/diagram.png</file>
   </qresource>
 </RCC>
