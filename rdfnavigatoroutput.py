@@ -15,4 +15,4 @@ class RDFNavigatorOutput(QWidget, Ui_ProjectOutputWidget):
         self.setupUi(self)
 
     def write(self, text):
-        self.textEdit.append("<b>{0}</b>".format(text))
+       self.textEdit.append(u"<b>{0}</b>".format(text))
